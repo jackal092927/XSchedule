@@ -1,0 +1,746 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions">
+<h:head>
+	<title>Welcome to XSchedule</title>
+
+	<f:facet name="last">
+		<h:outputStylesheet library="css" name="my-custom.css" />
+	</f:facet>
+</h:head>
+<h:body>
+
+	<p:layout id="mainLayout" widgetVar="mainLayout" fullPage="true">
+
+		<p:layoutUnit position="north" size="120" collapsible="true"
+			resizable="true" collapsed="true" closable="true">
+			<h:form id="layoutHeaderForm">
+
+				<p:dialog id="userDetailsDialog" widgetVar="userDetailsDialog"
+					modal="true" dynamic="true" appendToBody="true" closable="true"
+					resizable="false">
+					<f:facet name="header">
+						<p:commandButton
+							value="#{userDetailsBean.followed? 'Followed':'To Follow'}"
+							rendered="#{!userDetailsBean.self}"
+							actionListener="#{userDetailsBean.followClick}" update="@this"></p:commandButton>
+					</f:facet>
+					<h:form id="userDetailsForm">
+						<p:panelGrid id="userDetailsPanel" widgetVar="userDetailsPanel"
+							columns="2">
+
+							<f:facet name="header">
+								<p:outputLabel value="#{userDetailsBean.userModel.account}"></p:outputLabel>
+							</f:facet>
+
+							<p:outputLabel value="Name:"></p:outputLabel>
+							<p:inplace editor="true" toggleable="#{userDetailsBean.self}">
+								<p:inputText value="#{userDetailsBean.userModel.username}"
+									required="true" />
+								<p:ajax event="save" process="@this"
+									listener="#{userDetailsBean.onSave}"></p:ajax>
+							</p:inplace>
+
+							<p:outputLabel value="E-mail:"></p:outputLabel>
+							<p:inplace editor="true" toggleable="#{userDetailsBean.self}">
+								<p:inputText value="#{userDetailsBean.userModel.email}"
+									required="false" />
+								<p:ajax event="save" process="@this"
+									listener="#{userDetailsBean.onSave}"></p:ajax>
+							</p:inplace>
+
+							<p:outputLabel value="QQ:"></p:outputLabel>
+							<p:inplace editor="true" toggleable="#{userDetailsBean.self}">
+
+								<p:inputText value="#{userDetailsBean.userModel.qq_no}"
+									required="false">
+								</p:inputText>
+
+								<p:ajax event="save" process="@this"
+									listener="#{userDetailsBean.onSave}"></p:ajax>
+							</p:inplace>
+
+							<p:outputLabel value="Phone:"></p:outputLabel>
+							<p:inplace editor="true" toggleable="#{userDetailsBean.self}">
+								<p:inputText value="#{userDetailsBean.userModel.phone_no}"
+									required="false" />
+								<p:ajax event="save" process="@this"
+									listener="#{userDetailsBean.onSave}"></p:ajax>
+							</p:inplace>
+
+							<p:outputLabel value="Self introduction" />
+							<p:inplace editor="true"
+								emptyLabel="#{userDetailsBean.userModel.selfIntro}"
+								toggleable="#{userDetailsBean.self}">
+								<p:inputTextarea rows="5" cols="30"
+									value="#{userDetailsBean.userModel.selfIntro}" />
+								<p:ajax event="save" process="@this"
+									listener="#{userDetailsBean.onSave}"></p:ajax>
+							</p:inplace>
+
+						</p:panelGrid>
+					</h:form>
+				</p:dialog>
+
+				<ui:include src="/templates/defaultHeader.xhtml"></ui:include>
+			</h:form>
+		</p:layoutUnit>
+
+		<p:layoutUnit position="south" size="100" header="Bottom"
+			resizable="true" closable="true" collapsible="true" collapsed="true">
+			<ui:include src="/templates/defaultFooter.xhtml"></ui:include>
+		</p:layoutUnit>
+
+		<p:layoutUnit position="west" size="150px" header="Navigation Board"
+			resizable="true" closable="true" collapsible="true">
+			<ui:include src="/templates/defaultLefter.xhtml"></ui:include>
+		</p:layoutUnit>
+
+		<p:layoutUnit position="east" size="200" header="Right"
+			resizable="true" closable="true" collapsible="true" collapsed="true"
+			effect="drop">
+			<ui:include src="/templates/defaultRighter.xhtml"></ui:include>
+		</p:layoutUnit>
+
+
+
+		<p:layoutUnit position="center">
+			<h:form id="layoutCenterForm">
+
+				<p:dialog id="fileDialog" widgetVar="fileDialog" resizable="false"
+					closable="true" modal="false" height="620" width="650"
+					dynamic="true" appendToBody="true">
+					<h:form id="fileDialogForm">
+						<p:panelGrid columns="1" id="filePanel" widgetVar="filePanel">
+							<p:tabView id="fileTabView" widget="fileTabView" width="auto"
+								height="350" effect="fade">
+
+								<p:ajax event="tabChange"
+									listener="#{scheduleBean.fileBean.onFileTypeChange}" />
+
+								<p:tab title="Images">
+									<p:dataTable id="imgTable" var="file"
+										value="#{scheduleBean.fileBean.imgListModel}"
+										scrollable="true" rowIndexVar="row" rowKey="#{file.listIndex}"
+										selection="#{scheduleBean.fileBean.selectedFiles}">
+										<f:facet name="header">
+											<p:outputLabel value="Image File List" />
+										</f:facet>
+
+										<p:column selectionMode="multiple" style="width:8px" />
+
+										<p:column>
+											<f:facet name="header">
+												<p:outputLabel value="fileName" />
+											</f:facet>
+
+											<p:outputLabel value="#{file.file.name}"></p:outputLabel>
+
+										</p:column>
+
+										<p:column>
+											<f:facet name="header">
+												<p:outputLabel value="OPs" />
+											</f:facet>
+
+											<p:commandButton id="fileMarkButton"
+												widgetVar="fileMarkButton" value="#{file.marked? 'M':'m'}"
+												actionListener="#{scheduleBean.fileBean.mark(row)}"
+												process="@this :layoutCenterForm:fileDialogForm:fileTabView:imgTable"
+												update="imgTable" />
+
+											<p:commandButton id="singleFileDeleteButton" value="X"
+												widgetVar="singleFileDeleteButton"
+												process="@this :layoutCenterForm:fileDialogForm:fileTabView:imgTable"
+												update=":layoutCenterForm:selectedFileList"
+												actionListener="#{scheduleBean.fileBean.setSelectedFile(row)}"
+												oncomplete="fileDeleteConfirmDialog.show()"></p:commandButton>
+
+											<p:commandButton id="fileUrlButton" widgetVar="fileUrlButton"
+												value="U"
+												actionListener="#{scheduleBean.fileBean.setSelectedFile(row)}"
+												process="@this :layoutCenterForm:fileDialogForm:fileTabView:imgTable"
+												update=":layoutCenterForm:fileUrlDialog"
+												oncomplete="fileUrlDialog.show()" />
+
+											<p:commandButton id="singleFileViewButton"
+												widgetVar="singleFileViewButton" value="V"
+												actionListener="#{imgsViewBean.setImgList(scheduleBean.fileBean.getSelectedFile(row))}"
+												process="@this :layoutCenterForm:fileDialogForm:fileTabView:imgTable"
+												update=":layoutCenterForm:imgViewDialog"
+												oncomplete="imgViewDialog.show()" />
+										</p:column>
+
+										<f:facet name="footer">
+											<p:outputLabel
+												value="there are #{scheduleBean.fileBean.listSize} files in all" />
+											<p:commandButton id="fileViewButton"
+												widgetVar="fileViewButton" value="V" icon="ui-icon-search"
+												process="@this :layoutCenterForm:fileDialogForm:fileTabView:imgTable"
+												actionListener="#{imgsViewBean.setImgList(scheduleBean.fileBean.selectedFiles)}"
+												update=":layoutCenterForm:imgViewDialog"
+												oncomplete="imgViewDialog.show()" />
+											<p:commandButton id="fileDeleteButton" value="X"
+												widgetVar="fileDeleteButton"
+												process="@this :layoutCenterForm:fileDialogForm:fileTabView:imgTable"
+												update=":layoutCenterForm:selectedFileList"
+												oncomplete="fileDeleteConfirmDialog.show()"></p:commandButton>
+										</f:facet>
+									</p:dataTable>
+
+								</p:tab>
+
+								<p:tab title="Materials">
+									<p:dataTable id="materialsTable" var="file"
+										value="#{scheduleBean.fileBean.materialListModel}"
+										scrollable="true" rowIndexVar="row" rowKey="#{file.listIndex}"
+										selection="#{scheduleBean.fileBean.selectedFiles}">
+										<f:facet name="header">
+											<p:outputLabel value="Material File List" />
+										</f:facet>
+
+										<p:column selectionMode="multiple" style="width:8px" />
+
+										<p:column>
+											<f:facet name="header">
+												<p:outputLabel value="fileName" />
+											</f:facet>
+
+											<p:outputLabel value="#{file.file.name}"></p:outputLabel>
+
+										</p:column>
+
+										<p:column>
+											<f:facet name="header">
+												<p:outputLabel value="OPs" />
+											</f:facet>
+
+											<p:commandButton id="singleMaterialDeleteButton" value="X"
+												widgetVar="singleMaterialDeleteButton"
+												process="@this :layoutCenterForm:fileDialogForm:fileTabView:materialsTable"
+												update=":layoutCenterForm:selectedFileList"
+												actionListener="#{scheduleBean.fileBean.setSelectedFile(row)}"
+												oncomplete="fileDeleteConfirmDialog.show()"></p:commandButton>
+
+										</p:column>
+
+										<f:facet name="footer">
+											<p:outputLabel
+												value="there are #{scheduleBean.fileBean.listSize} files in all" />
+											<p:commandButton id="materialsDeleteButton" value="X"
+												widgetVar="materialsDeleteButton"
+												process="@this :layoutCenterForm:fileDialogForm:fileTabView:materialsTable"
+												update=":layoutCenterForm:selectedFileList"
+												oncomplete="fileDeleteConfirmDialog.show()"></p:commandButton>
+										</f:facet>
+									</p:dataTable>
+
+
+								</p:tab>
+
+								<p:tab title="Others">
+									<p:dataTable id="othersTable" var="file"
+										value="#{scheduleBean.fileBean.othersListModel}"
+										scrollable="true" rowIndexVar="row" rowKey="#{file.listIndex}"
+										selection="#{scheduleBean.fileBean.selectedFiles}">
+										<f:facet name="header">
+											<p:outputLabel value="Others File List" />
+										</f:facet>
+
+										<p:column selectionMode="multiple" style="width:8px" />
+
+										<p:column>
+											<f:facet name="header">
+												<p:outputLabel value="fileName" />
+											</f:facet>
+
+											<p:outputLabel value="#{file.file.name}"></p:outputLabel>
+
+										</p:column>
+
+										<p:column>
+											<f:facet name="header">
+												<p:outputLabel value="OPs" />
+											</f:facet>
+
+											<p:commandButton id="singleOtherDeleteButton" value="X"
+												widgetVar="singleOtherDeleteButton"
+												process="@this :layoutCenterForm:fileDialogForm:fileTabView:othersTable"
+												update=":layoutCenterForm:selectedFileList"
+												actionListener="#{scheduleBean.fileBean.setSelectedFile(row)}"
+												oncomplete="fileDeleteConfirmDialog.show()"></p:commandButton>
+
+										</p:column>
+
+										<f:facet name="footer">
+											<p:outputLabel
+												value="there are #{scheduleBean.fileBean.listSize} files in all" />
+											<p:commandButton id="othersDeleteButton" value="X"
+												widgetVar="othersDeleteButton"
+												process="@this :layoutCenterForm:fileDialogForm:fileTabView:othersTable"
+												update=":layoutCenterForm:selectedFileList"
+												oncomplete="fileDeleteConfirmDialog.show()"></p:commandButton>
+										</f:facet>
+									</p:dataTable>
+
+								</p:tab>
+
+							</p:tabView>
+
+							<p:fileUpload id="fileUpload" widgetVar="fileUpload"
+								fileUploadListener="#{scheduleBean.scheduleEventBean.handleFileUpload}"
+								process="@this" mode="advanced"
+								update=":layoutCenterForm:messages, filePanel" multiple="true"
+								sizeLimit="10000000" />
+
+						</p:panelGrid>
+					</h:form>
+				</p:dialog>
+
+				<p:dialog id="imgViewDialog" widgetVar="imgViewDialog"
+					dynamic="true" modal="false" appendToBody="true">
+					<h:form id="imgViewDialogForm">
+
+						<p:lightBox height="500px" id="lightBox">
+							<ui:repeat value="#{imgsViewBean.imgList}" var="img">
+								<h:outputLink value="#{img.relatedUrl}" title="#{img.file.name}">
+									<h:graphicImage name="#{img.resourcePathName}" library="events"
+										style="width:100px;height:75px;" />
+								</h:outputLink>
+							</ui:repeat>
+						</p:lightBox>
+
+					</h:form>
+				</p:dialog>
+
+				<p:dialog id="friendDialog" widgetVar="friendDialog"
+					header="Pick List" resizable="false" closable="true"
+					appendToBody="true">
+					<h:form id="friendPickForm">
+						<f:facet name="header">
+							<p:commandButton value="OK" process="@this"
+								actionListener="#{scheduleBean.test1}"
+								onComplete="friendDialog.hide()"></p:commandButton>
+						</f:facet>
+
+						<p:pickList id="friendPickList"
+							value="#{scheduleBean.scheduleEventBean.friendPickList.friendsPickList}"
+							var="friend" itemLabel="#{friend.relatedUserAccount}"
+							itemValue="#{friend}" dynamic="true" showCheckbox="true"
+							showSourceFilter="true" showTargetFilter="true"
+							filterMatchMode="contains" converter="friendPickListConverter">
+
+							<p:ajax event="transfer"
+								listener="#{scheduleBean.scheduleEventBean.friendPickList.onTransfer}" />
+
+							<f:facet name="sourceCaption">Waiting List</f:facet>
+							<f:facet name="targetCaption">Admission</f:facet>
+
+						</p:pickList>
+
+						<f:facet name="footer">
+
+							<p:commandButton value="Cancel" oncomplete="friendDialog.hide()"></p:commandButton>
+						</f:facet>
+
+					</h:form>
+				</p:dialog>
+
+				<p:dialog id="fileViewDialog" widgetVar="fileViewDialog">
+					<p:outputLabel value="fileViewDialog"></p:outputLabel>
+				</p:dialog>
+
+				<p:confirmDialog id="fileDeleteConfirmDialog"
+					header="DELETE CONFIRM" severity="alert"
+					widgetVar="fileDeleteConfirmDialog" appendToBody="true"
+					closeOnEscape="true" width="300px">
+					<f:facet name="message">
+						<p:dataList id="selectedFileList" widgetVar="selectedFileList"
+							value="#{scheduleBean.fileBean.selectedFiles}" var="file"
+							type="definition">
+							<p:panelGrid columns="1">
+								<p:outputLabel value="#{file.file.name}"></p:outputLabel>
+							</p:panelGrid>
+						</p:dataList>
+					</f:facet>
+
+					<p:commandButton id="fileDeleteConfirmButton" value="Yes Sure"
+						actionListener="#{scheduleBean.fileBean.delete}" process="@this"
+						update="fileDialogForm"
+						oncomplete="fileDeleteConfirmDialog.hide()" />
+					<p:commandButton id="fileDeleteCancelButton" value="Not Yet"
+						onclick="fileDeleteConfirmDialog.hide()" />
+				</p:confirmDialog>
+
+				<p:confirmDialog id="fileUrlDialog" widgetVar="fileUrlDialog"
+					header="Img Link" severity="info" appendToBody="true"
+					closeOnEscape="true" width="300px">
+					<f:facet name="message">
+						<p:outputLabel
+							value="#{scheduleBean.fileBean.selectedFiles[0].file.absolutePath}"></p:outputLabel>
+					</f:facet>
+				</p:confirmDialog>
+
+				<p:dialog id="eventDialog" widgetVar="eventDialog" resizable="false"
+					closable="false" modal="true" height="620" width="550"
+					dynamic="true" appendToBody="true">
+
+					<f:facet name="header">
+						<p:commandButton id="pinButton" widgetVar="pinButton"
+							value="#{scheduleBean.scheduleEventBean.event.pin ? 'PIN' : 'not PIN'}"
+							actionListener="#{scheduleBean.pinClick}" update="pinButton"
+							rendered="#{scheduleBean.scheduleEventBean.event.relatedType=='PUBLIC'}"
+							process="@this" />
+						<p:commandButton id="joinButton" widgetVar="joinButton"
+							rendered="#{scheduleBean.scheduleEventBean.event.relatedType=='PUBLIC'}"
+							value="#{scheduleBean.scheduleEventBean.event.join ? 'JOIN' : 'not JOIN'}"
+							actionListener="#{scheduleBean.joinClick}" update="joinButton"
+							process="@this" />
+					</f:facet>
+
+					<h:form id="eventDialogForm">
+
+						<p:panelGrid id="dialogPanel" widgetVar="dialogPanel" columns="1"
+							width="500">
+							<p:panelGrid width="500" height="400">
+
+								<f:facet name="header">
+									<p:outputLabel value="Brief title" />
+								</f:facet>
+
+								<p:row>
+									<p:column rowspan="3">
+										<p:commandLink
+											actionListener="#{imgsViewBean.setImgList(scheduleBean.fileBean.imgList)}"
+											update=":layoutCenterForm:imgViewDialog"
+											process="@this :layoutCenterForm:eventDialogForm:dialogPanel"
+											oncomplete="imgViewDialog.show()">
+
+											<p:graphicImage id="defaultShowImg"
+												widgetVar="defaultShowImg"
+												name="#{scheduleBean.scheduleEventBean.event.imageDefaultUri}"
+												library="events" height="120" width="90">
+											</p:graphicImage>
+										</p:commandLink>
+
+									</p:column>
+
+									<p:column>
+										<p:outputLabel
+											value="#{scheduleBean.scheduleEventBean.event.title}"></p:outputLabel>
+									</p:column>
+
+								</p:row>
+
+								<p:row>
+									<p:column>
+										<p:outputLabel
+											value="#{scheduleBean.scheduleEventBean.event.location}" />
+									</p:column>
+								</p:row>
+
+								<p:row>
+									<p:column>
+										<p:outputLabel
+											value="#{scheduleBean.scheduleEventBean.event.startDate}">
+											<f:convertDateTime pattern="dd/MM" />
+										</p:outputLabel>
+									</p:column>
+								</p:row>
+
+								<p:row>
+									<p:column>
+										<p:commandButton id="imgShowButton" widgetVar="imgShowButton"
+											actionListener="#{scheduleBean.test1}"
+											update=":layoutCenterForm:imgViewDialog" process="@this"
+											value="Show" oncomplete="imgViewDialog.show()" />
+									</p:column>
+									<p:column>
+										<p:outputLabel
+											value="#{scheduleBean.scheduleEventBean.event.endDate}">
+											<f:convertDateTime pattern="dd/MM" />
+										</p:outputLabel>
+									</p:column>
+								</p:row>
+
+							</p:panelGrid>
+
+
+							<p:tabView id="eventDialogTabView" widget="eventDialogTabView"
+								width="auto">
+								<p:tab title="brief">
+									<p:panelGrid id="eventDetails" widgetVar="eventDetails"
+										columns="2">
+										<f:facet name="header">
+											<p:inplace editor="true"
+												toggleable="#{request.isUserInRole('ROLE_ADMIN')||scheduleBean.scheduleEventBean.isPrivate()}">
+												<p:inputText
+													value="#{scheduleBean.scheduleEventBean.event.title}"
+													required="true" />
+												<p:ajax event="save" process="@this @form"
+													listener="#{scheduleBean.scheduleEventBean.onSave}"></p:ajax>
+											</p:inplace>
+										</f:facet>
+
+										<p:outputLabel id="owner"
+											value="#{scheduleBean.scheduleEventBean.event.owner}" />
+										<p:outputLabel />
+
+
+										<p:inplace editor="true"
+											toggleable="#{request.isUserInRole('ROLE_ADMIN')||scheduleBean.scheduleEventBean.isPrivate()}">
+											<p:inputText
+												value="#{scheduleBean.scheduleEventBean.event.location}" />
+											<p:ajax event="save" process="@this @form"
+												listener="#{scheduleBean.scheduleEventBean.onSave}"></p:ajax>
+										</p:inplace>
+										<p:outputLabel />
+
+										<p:outputLabel value="From:" />
+										<p:inplace editor="true"
+											toggleable="#{request.isUserInRole('ROLE_ADMIN')||scheduleBean.scheduleEventBean.isPrivate()}">
+											<p:inputMask
+												value="#{scheduleBean.scheduleEventBean.event.startDate}"
+												mask="99/99/9999 99:99">
+												<f:convertDateTime pattern="dd/MM/yyyy-hh/mm" />
+											</p:inputMask>
+											<p:ajax event="save" process="@this @form"
+												listener="#{scheduleBean.scheduleEventBean.onSave}"></p:ajax>
+										</p:inplace>
+
+										<p:outputLabel value="To:" />
+										<p:inplace editor="true"
+											toggleable="#{request.isUserInRole('ROLE_ADMIN')||scheduleBean.scheduleEventBean.isPrivate()}">
+											<p:inputMask
+												value="#{scheduleBean.scheduleEventBean.event.endDate}"
+												mask="99/99/9999">
+												<f:convertDateTime pattern="dd/MM/yyyy-hh/mm" />
+											</p:inputMask>
+											<p:ajax event="save" process="@this @form"
+												listener="#{scheduleBean.scheduleEventBean.onSave}"></p:ajax>
+										</p:inplace>
+
+										<p:outputLabel for="allDay" value="All Day:" />
+										<p:inplace editor="true"
+											toggleable="#{request.isUserInRole('ROLE_ADMIN')||scheduleBean.scheduleEventBean.isPrivate()}">
+											<p:selectBooleanButton id="allDay"
+												value="#{scheduleBean.scheduleEventBean.event.allDay}"
+												onLabel="Yes" offLabel="No" onIcon="ui-icon-check"
+												offIcon="ui-icon-close" />
+											<p:ajax event="save" process="@this @form"
+												listener="#{scheduleBean.scheduleEventBean.onSave}"></p:ajax>
+										</p:inplace>
+
+										<p:outputLabel for="categorySelect" value="Select category" />
+										<p:inplace editor="true"
+											toggleable="#{request.isUserInRole('ROLE_ADMIN')||scheduleBean.scheduleEventBean.isPrivate()}">
+											<p:selectOneMenu id="categorySelect"
+												value="#{scheduleBean.scheduleEventBean.classificationSelection.selectedCategory}"
+												var="c" effect="fade" panelStyle="width:200px"
+												style="width:200px"
+												valueChangeListener="#{scheduleBean.scheduleEventBean.onClassify}">
+												<f:selectItem itemLabel="[unclassified]"
+													itemValue="[unclassified]" />
+												<f:selectItems
+													value="#{scheduleBean.scheduleEventBean.classificationSelection.classifications}"
+													var="cat" itemLabel="#{cat.category}"
+													itemValue="#{cat.category}" />
+												<p:column>
+													<p:outputLabel value="#{c.category}" />
+												</p:column>
+												<p:column>
+													<p:outputLabel value="#{c.colorSetting}" />
+												</p:column>
+											</p:selectOneMenu>
+											<p:ajax event="save" process="@this @form"
+												listener="#{scheduleBean.scheduleEventBean.onSave}"></p:ajax>
+										</p:inplace>
+
+										<p:commandButton id="friendsButton" value="Invite Friends"
+											actionListener="#{scheduleBean.test1}"
+											rendered="#{scheduleBean.scheduleEventBean.isDeletable(request.isUserInRole('ROLE_ADMIN')) }"
+											oncomplete="friendDialog.show()" process="@this">
+										</p:commandButton>
+									</p:panelGrid>
+								</p:tab>
+
+								<p:tab title="details"
+									rendered="#{!scheduleBean.scheduleEventBean.isNewevent()}">
+
+									<pe:ckEditor id="detailContextEditor"
+										toolbar="[['Cut','Copy','Paste','PasteText','PasteFromWord','-', 'SpellChecker', 'Scayt', 'Image','Save']]"
+										value="#{scheduleBean.scheduleEventBean.contextEditorBean.content}"
+										width="400px" interfaceColor="#000000" checkDirtyInterval="0">
+										<p:ajax event="save"
+											listener="#{scheduleBean.scheduleEventBean.contextEditorBean.saveListener}" />
+									</pe:ckEditor>
+								</p:tab>
+
+								<p:tab title="comments"
+									rendered="#{!scheduleBean.scheduleEventBean.isNewevent()}">
+									<p:panelGrid columns="1" id="commentsPanel"
+										widgetVar="commentsPanel">
+										<f:facet name="footer">
+											<p:commandButton id="commentAddButton" rendered="false"
+												widgetVar="commentAddButton" value="Add Comment"></p:commandButton>
+											<p:commandButton id="commentSubmitButton" rendered="true"
+												widgetVar="commentSubmitButton" value="Submit"
+												process="@this :layoutCenterForm:eventDialogForm:eventDialogTabView:commentSubmitButton :layoutCenterForm:eventDialogForm:eventDialogTabView:detailContextEditor :layoutCenterForm:eventDialogForm:eventDialogTabView:commentsPanel"
+												actionListener="{scheduleBean.scheduleEventBean.commentsBean.addComment}"
+												update="commentList"></p:commandButton>
+
+											<p:commandButton id="commentCancelButton" rendered="false"
+												widgetVar="commentCancelButton" value="Cancel" />
+										</f:facet>
+
+										<p:dataList id="commentList" widgetVar="commentList"
+											value="#{scheduleBean.scheduleEventBean.commentsBean.commentList}"
+											var="com" type="definition">
+											<p:panelGrid columns="1" height="500px" width="400px">
+												<f:facet name="header">
+													<p:outputLabel value="#{com.ownerAccount}"></p:outputLabel>
+												</f:facet>
+
+												<h:outputText escape="false" value="#{com.context}"></h:outputText>
+
+												<f:facet name="footer">
+													<h:outputText value="#{com.publishTime}"></h:outputText>
+												</f:facet>
+											</p:panelGrid>
+
+										</p:dataList>
+
+										<pe:ckEditor id="commentContextEditor"
+											widgetVar="commentContextEditor" rendered="true"
+											toolbar="[['Cut','Copy','Paste','PasteText','PasteFromWord','-', 'SpellChecker', 'Scayt', 'Image','Save']]"
+											value="#{scheduleBean.scheduleEventBean.commentsBean.commentContext}"
+											width="400px" height="200px" interfaceColor="#FFFFFF"
+											checkDirtyInterval="0">
+											<p:ajax event="save"
+												listener="#{scheduleBean.scheduleEventBean.commentsBean.addComment}"
+												update="commentList" />
+										</pe:ckEditor>
+
+									</p:panelGrid>
+
+
+								</p:tab>
+
+								<p:tab title="others"
+									rendered="#{!scheduleBean.scheduleEventBean.isNewevent()}">
+									<p:dataTable id="otherMaterialsTable" var="file"
+										value="#{scheduleBean.fileBean.materialListModel}"
+										scrollable="true" rowIndexVar="row" rowKey="#{file.listIndex}"
+										selection="#{scheduleBean.fileBean.selectedFiles}">
+										<f:facet name="header">
+											<p:outputLabel value="Materials List" />
+										</f:facet>
+
+										<p:column selectionMode="multiple" style="width:8px" />
+
+										<p:column style="width:60%">
+											<f:facet name="header">
+												<p:outputLabel value="fileName" />
+											</f:facet>
+
+											<p:outputLabel value="#{file.file.name}"></p:outputLabel>
+
+										</p:column>
+
+										<p:column style="width: auto">
+											<f:facet name="header">
+												<p:outputLabel value="OPs" />
+											</f:facet>
+
+											<h:outputLink value="#{file.relatedUrl}" target="_blank"
+												title="#{file.file.name}">
+												<h:outputText value="VIEW"></h:outputText>
+											</h:outputLink>
+
+										</p:column>
+
+										<f:facet name="footer">
+											<p:outputLabel value="there are 13" />
+										</f:facet>
+									</p:dataTable>
+								</p:tab>
+							</p:tabView>
+
+							<f:facet name="footer">
+								<p:commandButton id="saveButton" value="Submit"
+									actionListener="#{scheduleBean.scheduleEventBean.onSubmit()}"
+									update=":layoutCenterForm:centerSchedule,:layoutLeftForm:navigationPanel:scheduleNavigationTree"
+									oncomplete="eventDialog.hide();"
+									rendered="#{scheduleBean.scheduleEventBean.isNewevent()}"
+									process="@this :layoutCenterForm:eventDialogForm:eventDialogTabView" />
+								<p:commandButton id="delectButton" value="Delete"
+									rendered="#{scheduleBean.scheduleEventBean.isDeletable(request.isUserInRole('ROLE_ADMIN')) }"
+									onclick="confirmation.show" oncomplete="eventDialog.hide();" />
+								<p:commandButton id="cancelButton" value="Cancel"
+									actionListener="#{scheduleBean.cancelEvent}"
+									oncomplete="eventDialog.hide();" process="@this" />
+								<p:commandButton id="fileButton" value="FILE"
+									rendered="#{request.isUserInRole('ROLE_ADMIN')||scheduleBean.scheduleEventBean.event.editable}"
+									update=":layoutCenterForm:fileDialog"
+									oncomplete="fileDialog.show()" process="@this" />
+
+							</f:facet>
+
+						</p:panelGrid>
+					</h:form>
+				</p:dialog>
+
+
+
+				<h:panelGroup id="centerPanelGroup">
+
+					<p:panelGrid id="boardPanel" widgetVar="boardPanel" columns="1"
+						rendered="#{'board' == navigationBean.currentPage}">
+						<f:facet name="header">
+							<p:outputLabel value="NoticeBoard"></p:outputLabel>
+						</f:facet>
+
+						<p:panelGrid id="recentBoardPanel" widgetVar="recentBoardPanel"
+							columns="1">
+							<p:carousel id="recentCarousel" value="#{boardBean.recentEvents}"
+								var="event">
+								<f:facet name="header">
+									<p:outputLabel value="Recent Events"></p:outputLabel>
+								</f:facet>
+								<h:panelGrid columns="1" style="width:100%" cellpadding="5">
+									<p:graphicImage id="defaultImg" widgetVar="defaultImg"
+										name="#{event.imageDefaultUri}" library="events" height="120"
+										width="90">
+									</p:graphicImage>
+
+									<h:outputText value="Title: #{event.title}" />
+
+									<h:outputText
+										value="Time: #{event.beginTime} - #{event.endTime}" />
+									<h:outputText value="Loc: #{event.location}" />
+
+								</h:panelGrid>
+								<f:facet name="footer">
+									<p:outputLabel value="In total there are 10 recent events"></p:outputLabel>
+								</f:facet>
+							</p:carousel>
+
+						</p:panelGrid>
+					</p:panelGrid>
+
+					<ui:include src="/pages/schedule.xhtml"></ui:include>
+
+					<p:panelGrid id="peoplePanel" widgetVar="peoplePanel"
+						rendered="#{'people' == navigationBean.currentPage}" columns="1">
+						<p:outputLabel value="PEOPLE"></p:outputLabel>
+					</p:panelGrid>
+
+				</h:panelGroup>
+			</h:form>
+		</p:layoutUnit>
+	</p:layout>
+</h:body>
+</html>

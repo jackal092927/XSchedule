@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core" xml:lang="en" lang="en"
+	xmlns:p="http://primefaces.org/ui">
+<h:head>
+	<title>JSF 2.x Page</title>
+	<meta http-equiv="keywords" content="enter,your,keywords,here" />
+	<meta http-equiv="description"
+		content="A short description of this page." />
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+
+	<!--<link rel="stylesheet" type="text/css" href="styles.css">-->
+</h:head>
+<h:body>
+	<h:form id="form">
+
+		<p:growl id="growl" showDetail="true" />
+
+		<p:dataTable id="activities" var="activity"
+			value="#{tableBean.mediumActivitiesModel}" paginator="true" rows="10"
+			selection="#{tableBean.selectedActivity}" selectionMode="single"
+			rowKey="#{activity.title}">
+
+			<p:ajax event="rowSelect" listener="#{tableBean.onRowSelect}"
+				update=":form:display :form:growl"
+				oncomplete="activityDialog.show()" />
+			<p:ajax event="rowUnselect" listener="#{tableBean.onRowUnselect}"
+				update=":form:growl" />
+
+			<f:facet name="header">  
+            	Select a row to display a message  
+        	</f:facet>
+
+			<p:column headerText="Title">  
+            	#{activity.title}  
+        	</p:column>
+
+			<p:column headerText="publisher">  
+            	#{activity.publisher}  
+        	</p:column>
+
+			<p:column headerText="location">  
+            	#{activity.location}  
+        	</p:column>
+
+
+		</p:dataTable>
+
+		<p:dialog id="dialog" header="Activity Detail"
+			widgetVar="activityDialog" resizable="false" showEffect="fade"
+			hideEffect="explode">
+
+			<h:panelGrid id="display" columns="2" cellpadding="4">
+
+				<f:facet name="header">
+
+				</f:facet>
+
+				<h:outputText value="Title:" />
+				<h:outputText value="#{tableBean.selectedActivity.title}" />
+
+				<h:outputText value="Publisher" />
+				<h:outputText value="#{tableBean.selectedActivity.publisher}" />
+
+				<h:outputText value="Location:" />
+				<h:outputText value="#{tableBean.selectedActivity.location}" />
+
+
+			</h:panelGrid>
+		</p:dialog>
+
+	</h:form>
+</h:body>
+</html>

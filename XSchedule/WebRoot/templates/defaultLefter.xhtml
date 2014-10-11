@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core" xml:lang="en" lang="en"
+	xmlns:p="http://primefaces.org/ui">
+<h:head>
+	<title>JSF 2.x Page</title>
+	<meta http-equiv="keywords" content="enter,your,keywords,here" />
+	<meta http-equiv="description"
+		content="A short description of this page." />
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+
+</h:head>
+<h:body>
+	<ui:composition>
+		<h:form id="layoutLeftForm">
+
+			<p:accordionPanel id="navigationPanel" widgetVar="navigatoinPanel"
+				style="padding: 2px;">
+
+				<p:tab title="Schedule" id="scheduleTab" widgetVar="scheduleTab">
+
+					<p:tree id="scheduleNavigationTree"
+						widgetVar="scheduleNavigationTree"
+						value="#{navigationScheduleBean.root}" var="nodeData"
+						dynamic="true" animate="true" selectionMode="checkbox"
+						selection="#{navigationScheduleBean.selectedNodes}"
+						style="width:200px;">
+
+						<p:treeNode expandedIcon="ui-icon-folder-open"
+							collapsedIcon="ui-icon-folder-collapsed">
+							<h:outputText value="#{nodeData}" />
+						</p:treeNode>
+
+					</p:tree>
+					<p:commandButton value="Show Selected Events"
+						actionListener="#{navigationScheduleBean.selectNodes}"
+						update=":layoutCenterForm:centerSchedule"></p:commandButton>
+
+					<p:menu style="auto">
+						<p:menuitem value="Schedule"
+							actionListener="#{navigationBean.onTabButtonClick('schedule')}"
+							update=":layoutCenterForm:centerPanelGroup" />
+					</p:menu>
+
+				</p:tab>
+
+				<p:tab title="Board">
+					<p:menu style="auto">
+						<p:menuitem value="Notice Board"
+							actionListener="#{navigationBean.onTabButtonClick('board')}"
+							update=":layoutCenterForm:centerPanelGroup" />
+					</p:menu>
+				</p:tab>
+
+
+				<p:tab title="People">
+					<p:commandButton value="PEOPLE"
+						actionListener="#{navigationBean.onTabButtonClick('people')}"
+						update=":layoutCenterForm:centerPanelGroup"></p:commandButton>
+				</p:tab>
+			</p:accordionPanel>
+
+		</h:form>
+	</ui:composition>
+</h:body>
+</html>

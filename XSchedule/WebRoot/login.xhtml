@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core" xml:lang="en" lang="en"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions">
+<h:head>
+	<title>login page</title>
+	<meta http-equiv="keywords" content="enter,your,keywords,here" />
+	<meta http-equiv="description"
+		content="A short description of this page." />
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+
+	<f:facet name="last">
+		<h:outputStylesheet library="css" name="login.css" />
+	</f:facet>
+
+
+	<!--<link rel="stylesheet" type="text/css" href="styles.css">-->
+</h:head>
+<h:body>
+	<div id="logo"></div>
+	<div id="loginDiv">
+
+		<h:form>
+
+			<!-- <p:panelGrid id="loginPanel" columns="2">
+				<f:facet name="header">
+					<p:outputLabel value="Login Form"></p:outputLabel>
+				</f:facet> -->
+
+
+			<div id="accountBox">
+				<p:inputText id="account" value="#{userBean.account}"
+					required="true"></p:inputText>
+			</div>
+			<div id="accountMsg">
+				<p:message id="accountMsg" for="account" display="icon"></p:message>
+			</div>
+			<div id="passwordBox">
+				<p:password id="password" value="#{userBean.password}"
+					required="true"></p:password>
+			</div>
+			<div id="passwordMsg">
+				<p:message id="passwordMsg" for="password" display="icon"></p:message>
+			</div>
+			<!-- <h:outputLink value="#{googleBean.authorizationUrl}"
+				title="Google Authorization" target="_blank">
+				<h:outputText value="Binding Google Calendar" />
+			</h:outputLink> -->
+
+			<!-- 	<p:lightBox iFrame="true">
+				<h:outputLink value="#{googleBean.authorizationUrl}"
+					title="Google Authorization">
+					<h:outputText value="Binding Google Calendar" />
+				</h:outputLink>
+			</p:lightBox> -->
+
+
+			<p:commandButton id="loginButton" value="Login"
+				action="#{userBean.login}" ajax="false" />
+			<p:selectBooleanButton id="rememberMeButton"
+				value="#{userBean.rememberMe}" onLabel="Yes" offLabel="No"
+				onIcon="ui-icon-check" offIcon="ui-icon-close"
+				style="margin:0 0 0 30px" />
+			<!-- 			</p:panelGrid> -->
+
+			<!-- 	<pe:ckEditor id="editor" widgetVar="ckEditor" value="Hello World"
+			checkDirtyInterval="0">
+		</pe:ckEditor>
+ -->
+
+
+		</h:form>
+	</div>
+</h:body>
+</html>

@@ -1,0 +1,58 @@
+body {
+	margin: 0;
+	padding: 0;
+	background-image: url("#{resource['imgs/home:loginsakura.png']}");
+	background-repeat: no-repeat;
+	background-position: center;
+	background-size: contain;
+	background-attachment: fixed;
+	color: #969595;
+	font: 14px/20px "Trebuchet MS", Arial, Helvetica, sans-serif;
+}
+
+
+#loginDiv {
+	position: absolute;
+	top: 50%;
+	left: 55%;
+	width: 300px;
+	height: 80px;
+	margin: -20px 0 0 -150px;
+}
+
+#logo {
+	background-image: url("#{resource['imgs/home:logl.png']}");
+	background-repeat: no-repeat;
+	background-position: center;
+	background-size: contain;
+	position: absolute;
+	top: 32%;
+	left: 50%;
+	width: 350px;
+	height: 120px;
+	margin: -20px 0 0 -150px;
+}
+
+#accountBox {
+	width: 300px;
+	position:related;
+	left:10;
+	height: 30px;
+}
+
+#passwordBox{
+	
+	
+}
+#loginPanel{
+	border-collapse:seperate;
+	border-style:outset;
+	background:transparent;
+	
+	height: 200px;
+	width: 50px;
+}
+
+#j_idt18:rememberMeButton{
+	margin: 
+}

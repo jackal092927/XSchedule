@@ -1,0 +1,166 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:sec="http://www.springframework.org/schema/security"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+	http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+	http://www.springframework.org/schema/tx
+	http://www.springframework.org/schema/tx/spring-tx-3.1.xsd
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context-3.1.xsd
+	http://www.springframework.org/schema/security
+	http://www.springframework.org/schema/security/spring-security-3.1.xsd
+">
+
+
+
+	<!-- Model Beans Declaration -->
+	<bean id="user" class="com.tongji.persistence.models.UserModel" />
+	<bean id="activity" class="com.tongji.persistence.models.ActivityModel" />
+	<bean id="course" class="com.tongji.persistence.models.CourseModel" />
+	<bean id="comment" class="com.tongji.persistence.models.CommentModel" />
+
+	<!-- sacn DAO package -->
+	<context:component-scan base-package="com.tongji.persistence"></context:component-scan>
+
+
+	<!-- 这个bean主要是为了得到ApplicationContext 所以它不需要其它属性 -->
+	<bean class="com.tongji.share.tools.MyApplicationContextUtils"></bean>
+	
+	<!-- for resource annotation -->
+	<!-- <bean class="org.springframework.context.annotation.CommonAnnotationBeanPostProcessor" /> --> 
+
+	<!--My Services Declaration -->
+	<bean id="userService" class="com.tongji.basicinfo.UserService">
+		<property name="userDAO" ref="userDAO" />
+	</bean>
+	<bean id="scheduleService" class="com.tongji.basicinfo.ScheduleService">
+		<property name="userService" ref="userService" />
+		<property name="activityService" ref="activityService" />
+		<property name="courseService" ref="courseService" />
+		<property name="userEventRelationService" ref="userEventRelationService" />
+	</bean>
+	<bean id="activityService" class="com.tongji.activityinfo.ActivityService">
+		<property name="activityDAO" ref="activityDAO"></property>
+	</bean>
+	<bean id="courseService" class="com.tongji.courseinfo.CourseService">
+		<property name="courseDAO" ref="courseDAO"></property>
+	</bean>
+	<bean id="navigationScheduleService" class="com.tongji.share.view.NavigationScheduleService">
+		<property name="userService" ref="userService"></property>
+	</bean>
+	<bean id="myUserDetailsService" class="com.tongji.basicinfo.MyUserDetailsService">
+		<property name="userDAO" ref="userDAO"></property>
+	</bean>
+	<bean id="userEventRelationService" class="com.tongji.basicinfo.UserEventRelationService">
+		<property name="activityDAO" ref="activityDAO"></property>
+	</bean>
+	<bean id="calendarSyncService" class="com.tongji.jackal.webservice.server.android.CalendarSyncService">
+		<property name="activityService" ref="activityService"></property>
+	</bean>
+
+
+
+	<!-- Data Source Declaration -->
+	<bean id="DataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+		destroy-method="close">
+		<property name="driverClass" value="com.mysql.jdbc.Driver" />
+		<property name="jdbcUrl" value="jdbc:mysql://localhost:3306/XScheduledb" />
+		<property name="user" value="root" />
+		<property name="password" value="111111" />
+		<property name="maxPoolSize" value="10" />
+		<property name="maxStatements" value="0" />
+		<property name="minPoolSize" value="5" />
+		<!-- <property name="hibernate.cache.use_second_level_cache" value="true"/> -->
+	</bean>
+
+	<!-- Session Factory Declaration -->
+	<bean id="SessionFactory"
+		class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+		<property name="dataSource" ref="DataSource" />
+
+		<property name="packagesToScan">
+			<list>
+				<value>com.tongji.persistence.*</value>
+			</list>
+		</property>
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">org.hibernate.dialect.MySQL5Dialect</prop>
+				<prop key="hibernate.show_sql">true</prop>
+			</props>
+		</property>
+	</bean>
+
+	<bean id="txProxyTemplate" abstract="true"
+		class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+		<property name="transactionManager" ref="txManager" />
+		<property name="transactionAttributes">
+			<props>
+				<prop key="*">readOnly</prop>
+				<prop key="add*">PROPAGATION_REQUIRED,-Exception</prop>
+				<prop key="save*">PROPAGATION_REQUIRED,-Exception</prop>
+				<prop key="modify*">PROPAGATION_REQUIRED,-Exception</prop>
+				<prop key="update*">PROPAGATION_REQUIRED,-Exception</prop>
+				<prop key="delete*">PROPAGATION_REQUIRED,-Exception</prop>
+				<prop key="remove*">PROPAGATION_REQUIRED,-Exception</prop>
+				<prop key="query*">PROPAGATION_REQUIRED, readOnly,-Exception</prop>
+				<prop key="load*">PROPAGATION_REQUIRED, -Exception</prop>
+				<prop key="store*">PROPAGATION_REQUIRED, -Exception</prop>
+			</props>
+		</property>
+	</bean>
+
+	<!-- Enable the configuration of transactional behavior based on annotations -->
+	<tx:annotation-driven transaction-manager="txManager"
+		proxy-target-class="true" />
+
+	<!-- Transaction Manager is defined -->
+	<bean id="txManager"
+		class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+		<property name="sessionFactory" ref="SessionFactory" />
+	</bean>
+
+	<bean id="rememberMeServices"
+		class="org.springframework.security.web.authentication.rememberme.TokenBasedRememberMeServices">
+		<property name="key" value="springSecKey" />
+		<property name="userDetailsService" ref="myUserDetailsService" />
+		<property name="alwaysRemember" value="true" />
+		<property name="tokenValiditySeconds" value="60" />
+	</bean>
+
+	<bean id="rememberMeAuthenticationProvider"
+		class="org.springframework.security.authentication.RememberMeAuthenticationProvider">
+		<property name="key" value="springSecKey" />
+	</bean>
+
+	<bean id="daoAuthenticationProvider"
+		class="org.springframework.security.authentication.dao.DaoAuthenticationProvider">
+		<property name="userDetailsService" ref="myUserDetailsService" />
+	</bean>
+
+
+	<sec:http pattern="/error.faces**" security="none" />
+	<sec:http auto-config="true" use-expressions="true"
+		access-denied-page="/error.faces" authentication-manager-ref="authManager">
+		<sec:intercept-url pattern="/pages/**" access="hasRole('ROLE_USER')" />
+		<sec:form-login login-page="/login.faces"
+			default-target-url="/pages/home.faces" authentication-failure-url="/login.faces" />
+		<sec:remember-me key="springSecKey" services-ref="rememberMeServices" />
+		<sec:logout invalidate-session="true"
+			delete-cookies="JSESSIONID,SPRING_SECURITY_REMEMBER_ME_COOKIE"
+			logout-success-url="/" />
+	</sec:http>
+
+
+	<sec:authentication-manager id="authManager"
+		alias="authenticationManager">
+		<sec:authentication-provider ref="rememberMeAuthenticationProvider"></sec:authentication-provider>
+		<sec:authentication-provider ref="daoAuthenticationProvider">
+			<!-- <sec:user-service id="userDetailsService"> <sec:user authorities="ROLE_USER,ROLE_ADMIN" 
+				name="092927" password="000000" /> </sec:user-service> -->
+		</sec:authentication-provider>
+	</sec:authentication-manager>
+
+</beans>

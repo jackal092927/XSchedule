@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core" xml:lang="en" lang="en"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:pe="http://primefaces.org/ui/extensions">
+<h:head>
+	<title>Primefaces Schedule</title>
+	<meta http-equiv="keywords" content="enter,your,keywords,here" />
+	<meta http-equiv="description"
+		content="A short description of this page." />
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+
+
+	<!--<link rel="stylesheet" type="text/css" href="styles.css">-->
+
+
+</h:head>
+<h:body>
+
+	<ui:composition>
+
+		<p:growl id="messages" />
+		<p:confirmDialog id="confirmDialog"
+			message="Are you sure about destroying the world?"
+			header="Initiating destroy process" severity="alert"
+			widgetVar="confirmation">
+
+			<p:commandButton id="confirmButton" value="Yes Sure"
+				update="centerSchedule messages" oncomplete="confirmation.hide()" />
+			<p:commandButton id="declineButton" value="Not Yet"
+				onclick="confirmation.hide()" type="button" />
+		</p:confirmDialog>
+
+		<p:schedule id="centerSchedule" value="#{scheduleBean.eventModel}"
+			editable="true" widgetVar="centerSchedule" timeZone="#{scheduleBean.timeZone}"
+			rendered="#{'schedule' == navigationBean.currentPage}">
+			<p:ajax event="dateSelect" listener="#{scheduleBean.onDateSelect}"
+				update="eventDialog,:layoutCenterForm:friendPickForm:friendPickList" oncomplete="eventDialog.show()" />
+			<p:ajax event="eventSelect" listener="#{scheduleBean.onEventSelect}"
+				update="eventDialog,:layoutCenterForm:friendPickForm:friendPickList" oncomplete="eventDialog.show();" />
+		</p:schedule>
+
+	</ui:composition>
+
+
+</h:body>
+</html>

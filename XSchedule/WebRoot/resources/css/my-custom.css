@@ -1,0 +1,53 @@
+/* body {
+	margin: 0;
+	padding: 0;
+	background-image: url("#{resource['imgs/home:loginsakura.png']}");
+	background-repeat: no-repeat;
+	background-position: center;
+	background-size: contain;
+	background-attachment: fixed;
+	color: #969595;
+	font: 14px/20px "Trebuchet MS", Arial, Helvetica, sans-serif;
+} */
+
+.ui-layout-unit-header {
+	font-size: 0.75em;
+}
+
+.ui-widget {
+	font-size: 0.75em;
+}
+
+#loginPanel{
+	height: 100%;
+	width:100%;
+}
+
+.ui-panelgrid {
+    border-collapse: collapse;
+}
+
+.ui-panelgrid .ui-panelgrid-header {
+    text-align:center;
+    padding:4px 5px;
+}
+
+.ui-panelgrid .ui-panelgrid-footer {
+    text-align: left;
+    padding:2px 5px;
+}
+
+.ui-panelgrid td {
+    border-width: 0px;
+    padding:4px 5px;
+}
+
+.ui-accordion-content {
+    border-top: 0 none;
+    margin-bottom: 2px;
+    margin-top: -2px;
+    overflow: auto;
+    padding: 0.5em;
+    position: relative;
+    top: 1px;
+}
